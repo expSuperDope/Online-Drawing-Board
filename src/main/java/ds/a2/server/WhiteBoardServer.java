@@ -1,12 +1,12 @@
 package ds.a2.server;
 
 import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import ds.a2.rmi.RMIClient;
 import ds.a2.rmi.RMIServer;
@@ -15,10 +15,12 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 
     private ArrayList<User> users;
 	private byte[] b;
+    private ArrayList<String> chatHistory;
 
     public WhiteBoardServer() throws RemoteException {
         super();
 		users = new ArrayList<User>();
+        chatHistory = new ArrayList<String>();
     }
 
     @Override
@@ -52,9 +54,26 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 
                 System.out.println(userName + " is coming!");
                 RMIClient wbc = (RMIClient) Naming.lookup("rmi://" + ip + ":" + port + "/" + serviceName);
-                System.out.println(wbc.weclome());
                 users.add(new User(userName, wbc));
+                if(b != null)
+                {
+                    wbc.get(b);
+                }
 
+                ArrayList<String> usrNames = new ArrayList<>();
+                for(User user : users){
+                    usrNames.add(user.name);
+                }
+
+                for(User user : users){
+                    try {
+                        user.rmic.getUserList(usrNames);
+                        user.rmic.getChatHistory(chatHistory);
+                    } 
+                    catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }	
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
@@ -66,8 +85,44 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
     }
 
     @Override
-    public String weclome() throws RemoteException {
-        return "Welcome to Server"; 
+    public void removeUser(String name) throws RemoteException {
+        
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (user.name.equals(name)) {
+                iterator.remove();
+                break;
+            }
+        }
+        
+        ArrayList<String> usrNames = new ArrayList<>();
+        for(User user : users)
+        {
+            usrNames.add(user.name);
+        }
+
+        for(User user : users)
+        {
+            try {
+                user.rmic.getUserList(usrNames);
+            } 
+            catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }	
     }
-    
+
+    @Override
+    public void newChatMsg(String name, String msg) throws RemoteException {
+        chatHistory.add(name + ": " + msg);
+        for(User user : users){
+            try {
+                user.rmic.getChatHistory(chatHistory);
+            } 
+            catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }	
+    }
 }

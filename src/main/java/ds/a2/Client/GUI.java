@@ -9,6 +9,10 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -34,11 +38,37 @@ public class GUI extends JFrame implements ActionListener {
     private JToolBar toolBar;
     public RMIServer rmis;
 
+    public ArrayList<String> usrList;
+    public ArrayList<String> chatHistory;
+    public JScrollPane usrArea;
+    public JScrollPane chatPlace;
+    public JTextField inputBox;
+
     public GUI(RMIServer rmis, String usrName) {
         super();
         this.rmis = rmis;
         this.usrName = usrName;
         initialize();
+    }
+
+    public void updateUserList()
+    {
+        JTextArea users = (JTextArea) usrArea.getViewport().getView();
+        users.setText("");
+        for(String u:usrList)
+        {
+            users.append(u + "\n");
+        }
+    }
+
+    public void updateChatBox()
+    {
+        JTextArea chatBox = (JTextArea) chatPlace.getViewport().getView();
+        chatBox.setText("");
+        for(String c:chatHistory)
+        {
+            chatBox.append(c + "\n");
+        }
     }
 
     public void initialize() {
@@ -52,7 +82,6 @@ public class GUI extends JFrame implements ActionListener {
         MenuBar mb = new MenuBar();
         Menu file = new Menu("File");
         Menu manage = new Menu("Management");
-        Menu account = new Menu("Account");
 
         MenuItem newFile = new MenuItem("New");
         MenuItem open = new MenuItem("Open");
@@ -61,8 +90,6 @@ public class GUI extends JFrame implements ActionListener {
         MenuItem close = new MenuItem("Close");
         MenuItem kick = new MenuItem("Kick");
         MenuItem clearAll = new MenuItem("Clean All");
-        MenuItem inf = new MenuItem("Account Information");
-        MenuItem logout = new MenuItem("Logout");
 
         file.add(newFile);
         file.add(open);
@@ -71,12 +98,9 @@ public class GUI extends JFrame implements ActionListener {
         file.add(close);
         manage.add(kick);
         manage.add(clearAll);
-        account.add(inf);
-        account.add(logout);
 
         mb.add(file);
         mb.add(manage);
-        mb.add(account);
         this.setMenuBar(mb);
 
         newFile.addActionListener(this);
@@ -86,8 +110,6 @@ public class GUI extends JFrame implements ActionListener {
         close.addActionListener(this);
         kick.addActionListener(this);
         clearAll.addActionListener(this);
-        inf.addActionListener(this);
-        logout.addActionListener(this);
 
         //2. Tool Bar
         toolBar = new JToolBar();
@@ -187,18 +209,18 @@ public class GUI extends JFrame implements ActionListener {
         JPanel listPanel = new JPanel(new BorderLayout());
         JTextArea userList = new JTextArea();
         userList.setEditable(false);
-        JScrollPane userScroll = new JScrollPane(userList);
-        userScroll.setPreferredSize(new Dimension(200, 120)); 
-        listPanel.add(userScroll, BorderLayout.NORTH);
+        usrArea = new JScrollPane(userList);
+        usrArea.setPreferredSize(new Dimension(200, 120)); 
+        listPanel.add(usrArea, BorderLayout.NORTH);
 
         JTextArea chatArea = new JTextArea();
         chatArea.setEditable(false);
-        JScrollPane chatScroll = new JScrollPane(chatArea);
-        listPanel.add(chatScroll, BorderLayout.CENTER);
+        chatPlace = new JScrollPane(chatArea);
+        listPanel.add(chatPlace, BorderLayout.CENTER);
         chatRoom.add(listPanel,BorderLayout.CENTER);
 
         JPanel inputPanel = new JPanel(new BorderLayout());
-        JTextField inputBox = new JTextField();
+        inputBox = new JTextField();
         JButton send = new JButton("Send");
         inputPanel.add(inputBox, BorderLayout.CENTER);
         inputPanel.add(send, BorderLayout.EAST);
@@ -213,6 +235,18 @@ public class GUI extends JFrame implements ActionListener {
         board.setRMI(rmis);
         board.setBackground(Color.WHITE);
         this.add(board, BorderLayout.CENTER);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window is closing...");
+                try {
+                    rmis.removeUser(usrName);
+                } catch (RemoteException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -231,14 +265,14 @@ public class GUI extends JFrame implements ActionListener {
             System.out.println("Kick clicked");
         } else if (command.equals("Clean All")) {
             System.out.println("Clean");
-        } else if (command.equals("Account Information")) {
-            System.out.println("Inf clicked");
-        } else if (command.equals("Logout")) {
-            System.out.println("Logout clicked");
         } else if (command.equals("Send")) {
-            System.out.println("Send Message");
-        } else if (command.equals("Send")) {
-            System.out.println("Send Message");
+            try {
+                String msg = inputBox.getText();
+                rmis.newChatMsg(usrName, msg);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
+            inputBox.setText("");
         } 
         
         

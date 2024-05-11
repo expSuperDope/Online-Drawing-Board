@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.imageio.ImageIO;
@@ -41,8 +42,15 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 	}
 
 	@Override
-	public String weclome() throws RemoteException {
-		return "Weclcome to client";
+	public void getUserList(ArrayList<String> names) throws RemoteException {
+		gui.usrList = names;
+		gui.updateUserList();
+	}
+
+	@Override
+	public void getChatHistory(ArrayList<String> history) throws RemoteException {
+		gui.chatHistory = history;
+		gui.updateChatBox();
 	}
 
 }

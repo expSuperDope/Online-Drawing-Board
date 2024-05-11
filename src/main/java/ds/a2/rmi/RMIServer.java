@@ -7,5 +7,6 @@ public interface RMIServer extends Remote{
 	public void synchronize(byte[] b) throws RemoteException;
     public void broadcast(String msg) throws RemoteException;
     public void registerInServer(String[] clientInf) throws RemoteException;
-    public String weclome() throws RemoteException;
+    public void removeUser(String userName) throws RemoteException;
+    public void newChatMsg(String name, String msg) throws RemoteException;
 }
