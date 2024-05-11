@@ -61,4 +61,14 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 			return true;
 		}
 	}
+
+	@Override
+	public void close() throws RemoteException {
+        System.exit(0); 
+	}
+
+	@Override
+	public void getServerMsg(String msg) throws RemoteException {
+		JOptionPane.showMessageDialog(null, msg, "Message", JOptionPane.INFORMATION_MESSAGE);
+	}
 }

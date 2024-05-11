@@ -101,6 +101,21 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
         }
 
         chatHistory.add("[Server]: " + name + " left.");
+        if(name.equals(managerName))
+        {
+            chatHistory.add("[Server]: Manager left.\n[Server]: Application will close soon.");
+            for(User user : users)
+            {
+                try {
+                    user.rmic.getChatHistory(chatHistory);
+                    user.rmic.close();
+                } 
+                catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }	
+        }
+        
         for(User user : users)
         {
             try {
@@ -155,11 +170,6 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
     }
 
     @Override
-    public void close() throws RemoteException {
-        System.exit(0);
-    }
-
-    @Override
     public boolean isFirst(String name) throws RemoteException {
         if(users.size() == 0)
         {
@@ -169,6 +179,17 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
         else
         {
             return false;
+        }
+    }
+
+    @Override
+    public void kick(String name) throws RemoteException {
+        for(User user : users){
+            if(user.name.equals(name))
+            {
+                user.rmic.getServerMsg("You are kicked by manager!");
+                user.rmic.close();
+            }
         }
     }
 }

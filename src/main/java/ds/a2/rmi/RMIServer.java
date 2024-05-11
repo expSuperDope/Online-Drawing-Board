@@ -11,7 +11,7 @@ public interface RMIServer extends Remote{
 
     public boolean isFirst(String name) throws RemoteException;
     public boolean ifDuplicate(String name) throws RemoteException;
-    public boolean isAllowed(String name) throws RemoteException;
-
-    public void close() throws RemoteException;
+    public boolean isAllowed(String name) throws RemoteException;  
+    
+    public void kick(String name) throws RemoteException;
 }

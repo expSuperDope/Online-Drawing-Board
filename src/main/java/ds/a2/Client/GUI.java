@@ -20,6 +20,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -36,6 +37,7 @@ public class GUI extends JFrame implements ActionListener {
     public Board board;
     public String usrName;
     private JToolBar toolBar;
+    private MenuBar mb;
     public RMIServer rmis;
     public boolean isManager;
 
@@ -81,7 +83,7 @@ public class GUI extends JFrame implements ActionListener {
         this.setTitle("Online Drawing Board");
 
         //1. Menu Bar
-        MenuBar mb = new MenuBar();
+        mb = new MenuBar();
         Menu file = new Menu("File");
         Menu manage = new Menu("Management");
 
@@ -103,8 +105,12 @@ public class GUI extends JFrame implements ActionListener {
 
         mb.add(file);
         mb.add(manage);
-        this.setMenuBar(mb);
-
+        if(isManager)
+        {
+            this.setMenuBar(mb);
+        }
+        
+    
         newFile.addActionListener(this);
         open.addActionListener(this);
         save.addActionListener(this);
@@ -251,6 +257,10 @@ public class GUI extends JFrame implements ActionListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 System.out.println("Window is closing...");
+                if(!isManager)
+                {
+                    JOptionPane.showMessageDialog(null, "Waiting all peers quiting!", "Wait", JOptionPane.INFORMATION_MESSAGE);
+                }
                 try {
                     rmis.removeUser(usrName);
                 } catch (RemoteException e1) {
@@ -273,7 +283,22 @@ public class GUI extends JFrame implements ActionListener {
         } else if (command.equals("Close")) {
             System.out.println("Close clicked");
         } else if (command.equals("Kick")) {
-            System.out.println("Kick clicked");
+            String input = JOptionPane.showInputDialog(null, "Please enter the user name of user that you want to kick:");
+            if (input != null) 
+            {
+                if(input == usrName)
+                {
+                    JOptionPane.showMessageDialog(null, "You cannot kick yourself", "Error", JOptionPane.INFORMATION_MESSAGE);
+                }
+                else
+                {
+                    try {
+                        rmis.kick(input);
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            } 
         } else if (command.equals("Clean All")) {
             System.out.println("Clean");
         } else if (command.equals("Send")) {
@@ -285,8 +310,6 @@ public class GUI extends JFrame implements ActionListener {
             }
             inputBox.setText("");
         } 
-        
-        
         else if (command.equals("Line")) {
             board.changeMode(DrawType.Line);
         } else if (command.equals("Rectangle")) {
