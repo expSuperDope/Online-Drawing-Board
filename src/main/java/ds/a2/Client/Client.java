@@ -20,6 +20,7 @@ import javax.print.DocFlavor.STRING;
 
 public class Client {
 
+
     public static int findAvailablePort() throws IOException {
         try (ServerSocket socket = new ServerSocket(0)) {
             int port = socket.getLocalPort();
@@ -35,24 +36,28 @@ public class Client {
             String serverPort = args[1];
             String userName = args[2];
 
+            //Get Client Ip and port
             InetAddress localHost = InetAddress.getLocalHost();
             String clientIp = localHost.getHostAddress();
             int clientPort = findAvailablePort();
             System.out.println(clientIp);
             System.out.println(clientPort);
-			RMIClient rc = new WhiteBoardClient();
-            Registry registry = LocateRegistry.createRegistry(clientPort);
-            registry.bind("whiteboardclient", rc);   
-            System.out.println("the port: "+ clientPort + " \nserver ready");
 
+            //Connect to Server
             String[] cinf = new String[4];
             cinf[0] = userName;
             cinf[1] = clientIp;
             cinf[2] = String.valueOf(clientPort);
             cinf[3] = "whiteboardclient";
-            RMIServer wbs = (RMIServer) Naming.lookup("rmi://" + serverIp + ":" + serverPort + "/whiteboardserver");
-            wbs.registerInServer(cinf);  
+            RMIServer rmis = (RMIServer) Naming.lookup("rmi://" + serverIp + ":" + serverPort + "/whiteboardserver");
+            
+            RMIClient rmic = new WhiteBoardClient(rmis, userName);
+            Registry registry = LocateRegistry.createRegistry(clientPort);
+            registry.bind("whiteboardclient", rmic);   
+            System.out.println("the port: "+ clientPort + " \nserver ready");
 
+            rmis.registerInServer(cinf); 
+        
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (AlreadyBoundException e) {

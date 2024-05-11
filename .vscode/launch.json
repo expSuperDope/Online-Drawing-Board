@@ -29,7 +29,8 @@
             "name": "GUI",
             "request": "launch",
             "mainClass": "ds.a2.Client.GUI",
-            "projectName": "drawboard"
+            "projectName": "drawboard",
+            "vmArgs": ["-Xmx1g"]
         },
         {
             "type": "java",

@@ -27,17 +27,16 @@ public class Board extends JPanel{
     private DrawType currentMode = DrawType.Line;
 	private EraserSize currentSize = EraserSize.Small;
 	private Color currentColor = Color.BLACK;
-	//private RMIServer rmis;
-	private String rmis = "1";
+	private RMIServer rmis;
 	private BufferedImage board;
 	
     private static List<Point> points = new ArrayList<Point>();
     private static List<Shape> shapes = new ArrayList<Shape>();
 	private static List<Shape> tmpShapes = new ArrayList<Shape>();
     
-    // public void setRMI(RMIServer rmis) {
-    // 	this.rmis = rmis;
-    // }
+    public void setRMI(RMIServer rmis) {
+    	this.rmis = rmis;
+    }
 
 	public void changeMode(DrawType mode) {
 		this.currentMode = mode;
@@ -83,16 +82,16 @@ public class Board extends JPanel{
 			shape.generate_shape(g2d);
 		}
 
-		for(Shape tmpShape : tmpShapes)
-		{
-			tmpShape.generate_shape(g2d);
-		}
-
 		if(sPoint != null && ePoint != null)
 		{
 			g2d.setColor(currentColor);
 			if(currentMode == DrawType.Free || currentMode == DrawType.Eraser)
 			{
+				for(Shape tmpShape : tmpShapes)
+				{
+					tmpShape.generate_shape(g2d);
+				}
+
 				if(currentMode == DrawType.Eraser)
 				{
 					g2d.setColor(Color.WHITE);
@@ -143,24 +142,22 @@ public class Board extends JPanel{
 				g2d.drawRect(x, y, width, height);
 			}
 		}
-		//synchronize();
     }
 	
-	// public void synchronize() {
-	// 	try {	        
-	// 		BufferedImage image = getImageFromBoard();
-	// 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-	// 		ImageIO.write(image,"png", out);
-	// 		byte[] b = out.toByteArray();
-	// 		rmis.synchronize(b);
-	// 	} catch (RemoteException e) {
-	// 		JOptionPane.showMessageDialog(null, "the manager has left the room", "error", JOptionPane.ERROR_MESSAGE);
-	// 		e.printStackTrace();
-	// 		System.exit(0);
-	// 	} catch (IOException e) {
-	// 		e.printStackTrace();
-	// 	}        
-	// }
+	public void synchronize() {
+		try {	        
+			BufferedImage image = getImageFromBoard();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ImageIO.write(image,"png", out);
+			byte[] b = out.toByteArray();
+			rmis.synchronize(b);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			System.exit(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}        
+	}
 
     public Board() {
         addMouseListener(new MouseAdapter() {
@@ -179,7 +176,7 @@ public class Board extends JPanel{
 						g2d.setColor(currentColor);
 						g2d.drawString(text, sPoint.x, sPoint.y);
 						shapes.add(new Shape(DrawType.Text, sPoint, text, currentColor));
-						//synchronize();
+						synchronize();
 					}
 				}
 			}
@@ -204,6 +201,8 @@ public class Board extends JPanel{
 					{
 						g2d.drawOval(x, y, Math.max(width, height), Math.max(width, height));
 						shapes.add(new Shape(DrawType.Circle, sPoint, ePoint, currentColor));
+						sPoint = null;
+						ePoint = null;
 					}
 					else if(currentMode == DrawType.Oval)
 					{
@@ -229,11 +228,11 @@ public class Board extends JPanel{
 						shapes.add(new Shape(DrawType.Eraser, path, currentSize));
 						tmpShapes.clear();
 					}
-					points.clear();
-					//synchronize();
 					sPoint = null;
 					ePoint = null;
+					points.clear();
 					repaint();
+					synchronize();
 				}	
 			}
 		});

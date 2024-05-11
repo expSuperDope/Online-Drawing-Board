@@ -26,7 +26,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 		this.b = b;
 		for(User user : users){
 			try {
-				user.iclient.get(b);
+				user.rmic.get(b);
 			} 
 			catch (RemoteException e) {
 				e.printStackTrace();
@@ -50,10 +50,11 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                 String port = clientInf[2];
                 String serviceName = clientInf[3];
 
-                RMIClient wbc = (RMIClient) Naming.lookup("rmi://" + ip + ":" + port + "/" + serviceName);
-                System.out.println("the port: "+ port + " \nserver ready");
                 System.out.println(userName + " is coming!");
+                RMIClient wbc = (RMIClient) Naming.lookup("rmi://" + ip + ":" + port + "/" + serviceName);
                 System.out.println(wbc.weclome());
+                users.add(new User(userName, wbc));
+
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {

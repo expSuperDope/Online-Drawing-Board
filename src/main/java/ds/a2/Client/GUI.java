@@ -9,7 +9,6 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Locale;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,15 +25,19 @@ import javax.swing.WindowConstants;
 
 import ds.a2.DrawType;
 import ds.a2.EraserSize;
+import ds.a2.rmi.RMIServer;
 
 public class GUI extends JFrame implements ActionListener {
 
-    private Board board;
-    private String usrName = "test";
+    public Board board;
+    public String usrName;
     private JToolBar toolBar;
+    public RMIServer rmis;
 
-    public GUI() {
+    public GUI(RMIServer rmis, String usrName) {
         super();
+        this.rmis = rmis;
+        this.usrName = usrName;
         initialize();
     }
 
@@ -144,6 +147,8 @@ public class GUI extends JFrame implements ActionListener {
         button5.addActionListener(this);
         button6.addActionListener(this);
         button7.addActionListener(this);
+        colorButton.addActionListener(this);
+
         eraserSize.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Object source = e.getSource();
@@ -176,7 +181,7 @@ public class GUI extends JFrame implements ActionListener {
 
         //3. Chat Room
         JPanel chatRoom = new JPanel(new BorderLayout());
-        JLabel name = new JLabel("User Name: " + usrName);
+        JLabel name = new JLabel("User: " + usrName);
         chatRoom.add(name, BorderLayout.NORTH);
 
         JPanel listPanel = new JPanel(new BorderLayout());
@@ -205,6 +210,7 @@ public class GUI extends JFrame implements ActionListener {
 
         //4.
         board = new Board();
+        board.setRMI(rmis);
         board.setBackground(Color.WHITE);
         this.add(board, BorderLayout.CENTER);
     }
@@ -256,17 +262,12 @@ public class GUI extends JFrame implements ActionListener {
             board.changeMode(DrawType.Text);
             System.out.println("7");
         } else if (command.equals("Color")) {
+            System.out.println("8");
             Color selectedColor = JColorChooser.showDialog(toolBar, "Choose a Color", Color.BLACK);
             if (selectedColor != null) 
             {
                 board.setColor(selectedColor); 
             }
         } 
-    }
-    
-    public static void main(String[] args) {
-        Locale.setDefault(new Locale("en", "US"));
-        GUI gui = new GUI();
-        gui.setVisible(true);
     }
 }

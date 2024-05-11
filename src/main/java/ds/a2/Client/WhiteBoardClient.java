@@ -5,16 +5,21 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Locale;
+
 import javax.imageio.ImageIO;
 import ds.a2.rmi.RMIClient;
+import ds.a2.rmi.RMIServer;
 
 public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 
-	private GUI gui;
+	public GUI gui;
 
-	protected WhiteBoardClient() throws RemoteException {
+	protected WhiteBoardClient(RMIServer rmis, String usrname) throws RemoteException {
 		super();
-		gui = new GUI();
+		Locale.setDefault(new Locale("en", "US"));
+		gui = new GUI(rmis, usrname);
+		gui.setVisible(true);
 	}
 
 	@Override
@@ -22,7 +27,7 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 		try {
 			ByteArrayInputStream in = new ByteArrayInputStream(b);
 			BufferedImage image = ImageIO.read(in);
-			//gui.board.loadImage(image);
+			gui.board.loadImage(image);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
