@@ -50,6 +50,11 @@ public class Client {
             cinf[2] = String.valueOf(clientPort);
             cinf[3] = "whiteboardclient";
             RMIServer rmis = (RMIServer) Naming.lookup("rmi://" + serverIp + ":" + serverPort + "/whiteboardserver");
+            if(rmis.ifDuplicate(userName))
+            {
+                System.out.println("You are not allowed, because there is already a user called " + userName);
+                return;
+            }
             
             RMIClient rmic = new WhiteBoardClient(rmis, userName);
             Registry registry = LocateRegistry.createRegistry(clientPort);

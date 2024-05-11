@@ -52,9 +52,9 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                 String port = clientInf[2];
                 String serviceName = clientInf[3];
 
-                System.out.println(userName + " is coming!");
                 RMIClient wbc = (RMIClient) Naming.lookup("rmi://" + ip + ":" + port + "/" + serviceName);
                 users.add(new User(userName, wbc));
+                
                 if(b != null)
                 {
                     wbc.get(b);
@@ -124,5 +124,17 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                 e.printStackTrace();
             }
         }	
+    }
+
+    @Override
+    public boolean ifDuplicate(String name) throws RemoteException {
+        for(User u:users)
+        {
+            if(u.name.equals(name))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

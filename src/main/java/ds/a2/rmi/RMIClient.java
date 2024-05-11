@@ -9,4 +9,5 @@ public interface RMIClient extends Remote{
 	public void getMsgFromServer() throws RemoteException;
 	public void getUserList(ArrayList<String> names) throws RemoteException;
 	public void getChatHistory(ArrayList<String> history) throws RemoteException;
+	
 }

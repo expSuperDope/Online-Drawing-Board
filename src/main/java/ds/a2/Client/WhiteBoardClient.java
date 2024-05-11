@@ -52,5 +52,4 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 		gui.chatHistory = history;
 		gui.updateChatBox();
 	}
-
 }
