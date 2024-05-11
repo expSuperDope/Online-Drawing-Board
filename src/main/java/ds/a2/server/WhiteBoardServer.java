@@ -16,6 +16,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
     private ArrayList<User> users;
 	private byte[] b;
     private ArrayList<String> chatHistory;
+    private String managerName = null;
 
     public WhiteBoardServer() throws RemoteException {
         super();
@@ -36,11 +37,6 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 		}	
 	}
 
-    @Override
-    public void broadcast(String msg) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'broadcast'");
-    }
 
     @Override
     public void registerInServer(String[] clientInf) throws RemoteException {
@@ -65,6 +61,8 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                     usrNames.add(user.name);
                 }
 
+
+                chatHistory.add("[Server]: " + userName + " entered.");
                 for(User user : users){
                     try {
                         user.rmic.getUserList(usrNames);
@@ -102,10 +100,12 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
             usrNames.add(user.name);
         }
 
+        chatHistory.add("[Server]: " + name + " left.");
         for(User user : users)
         {
             try {
                 user.rmic.getUserList(usrNames);
+                user.rmic.getChatHistory(chatHistory);
             } 
             catch (RemoteException e) {
                 e.printStackTrace();
@@ -115,7 +115,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 
     @Override
     public void newChatMsg(String name, String msg) throws RemoteException {
-        chatHistory.add(name + ": " + msg);
+        chatHistory.add("["+ name + "]: " + msg);
         for(User user : users){
             try {
                 user.rmic.getChatHistory(chatHistory);
@@ -136,5 +136,39 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean isAllowed(String name) throws RemoteException {
+        for(User user : users){
+            try {
+                if(user.name.equals(managerName))
+                {
+                    return user.rmic.checkNewUser(name);
+                }
+            } 
+            catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void close() throws RemoteException {
+        System.exit(0);
+    }
+
+    @Override
+    public boolean isFirst(String name) throws RemoteException {
+        if(users.size() == 0)
+        {
+            this.managerName = name;
+            return true;
+        } 
+        else
+        {
+            return false;
+        }
     }
 }

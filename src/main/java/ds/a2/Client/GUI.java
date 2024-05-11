@@ -37,6 +37,7 @@ public class GUI extends JFrame implements ActionListener {
     public String usrName;
     private JToolBar toolBar;
     public RMIServer rmis;
+    public boolean isManager;
 
     public ArrayList<String> usrList;
     public ArrayList<String> chatHistory;
@@ -44,10 +45,11 @@ public class GUI extends JFrame implements ActionListener {
     public JScrollPane chatPlace;
     public JTextField inputBox;
 
-    public GUI(RMIServer rmis, String usrName) {
+    public GUI(RMIServer rmis, String usrName, Boolean isManager) {
         super();
         this.rmis = rmis;
         this.usrName = usrName;
+        this.isManager = isManager;
         initialize();
     }
 
@@ -203,7 +205,16 @@ public class GUI extends JFrame implements ActionListener {
 
         //3. Chat Room
         JPanel chatRoom = new JPanel(new BorderLayout());
-        JLabel name = new JLabel("User: " + usrName);
+        String showingName = "";
+        if(isManager)
+        {
+            showingName = "User: " + usrName + "(Manager)";
+        }
+        else
+        {
+            showingName = "User: " + usrName;
+        }
+        JLabel name = new JLabel(showingName);
         chatRoom.add(name, BorderLayout.NORTH);
 
         JPanel listPanel = new JPanel(new BorderLayout());

@@ -9,17 +9,21 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+
 import ds.a2.rmi.RMIClient;
 import ds.a2.rmi.RMIServer;
 
 public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 
 	public GUI gui;
+	public boolean isManager;
 
-	protected WhiteBoardClient(RMIServer rmis, String usrname) throws RemoteException {
+	protected WhiteBoardClient(RMIServer rmis, String usrname, Boolean isManager) throws RemoteException {
 		super();
 		Locale.setDefault(new Locale("en", "US"));
-		gui = new GUI(rmis, usrname);
+		this.isManager = isManager;
+		gui = new GUI(rmis, usrname, isManager);
 		gui.setVisible(true);
 	}
 
@@ -36,12 +40,6 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 	}
 
 	@Override
-	public void getMsgFromServer() throws RemoteException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getMsgFromServer'");
-	}
-
-	@Override
 	public void getUserList(ArrayList<String> names) throws RemoteException {
 		gui.usrList = names;
 		gui.updateUserList();
@@ -51,5 +49,16 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 	public void getChatHistory(ArrayList<String> history) throws RemoteException {
 		gui.chatHistory = history;
 		gui.updateChatBox();
+	}
+
+	@Override
+	public boolean checkNewUser(String name) throws RemoteException {
+		int flag = JOptionPane.showConfirmDialog(null, name + " want to join the whiteboard\n" + "is it fine?","Check", JOptionPane.YES_NO_OPTION);
+		if(flag == 1) {
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 }
