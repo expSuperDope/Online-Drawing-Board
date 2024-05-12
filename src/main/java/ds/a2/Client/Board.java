@@ -25,7 +25,7 @@ public class Board extends JPanel{
 
 	private Point sPoint, ePoint;
     private DrawType currentMode = DrawType.Line;
-	private EraserSize currentSize = EraserSize.Small;
+	public EraserSize currentSize = EraserSize.Small;
 	private Color currentColor = Color.BLACK;
 	private RMIServer rmis;
 	private BufferedImage board;

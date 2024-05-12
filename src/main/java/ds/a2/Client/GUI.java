@@ -103,7 +103,6 @@ public class GUI extends JFrame implements ActionListener {
         MenuItem saveAs = new MenuItem("Save As");
         MenuItem close = new MenuItem("Close");
         MenuItem kick = new MenuItem("Kick");
-        MenuItem clearAll = new MenuItem("Clean All");
 
         file.add(newFile);
         file.add(open);
@@ -111,7 +110,6 @@ public class GUI extends JFrame implements ActionListener {
         file.add(saveAs);
         file.add(close);
         manage.add(kick);
-        manage.add(clearAll);
 
         mb.add(file);
         mb.add(manage);
@@ -120,14 +118,12 @@ public class GUI extends JFrame implements ActionListener {
             this.setMenuBar(mb);
         }
         
-    
         newFile.addActionListener(this);
         open.addActionListener(this);
         save.addActionListener(this);
         saveAs.addActionListener(this);
         close.addActionListener(this);
         kick.addActionListener(this);
-        clearAll.addActionListener(this);
 
         //2. Tool Bar
         toolBar = new JToolBar();
@@ -140,14 +136,11 @@ public class GUI extends JFrame implements ActionListener {
         JButton button3 = new JButton("Circle");
         JButton button4 = new JButton("Oval");
         JButton button5 = new JButton("Free Draw");
-        JButton button6 = new JButton("Eraser");
         JButton button7 = new JButton("Text");
-
-        String[] options = {"Small", "Medium", "Large"};
-        JComboBox<String> eraserSize = new JComboBox<>(options);
-
         JButton colorButton = new JButton("Color");
-        colorButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        JButton eraser1 = new JButton("S Eraser");
+        JButton eraser2 = new JButton("M Eraser");
+        JButton eraser3 = new JButton("L Eraser");
 
         Font buttonFont = new Font("Arial", Font.BOLD, 16);
         button1.setFont(buttonFont);
@@ -155,20 +148,23 @@ public class GUI extends JFrame implements ActionListener {
         button3.setFont(buttonFont);
         button4.setFont(buttonFont);
         button5.setFont(buttonFont);
-        button6.setFont(buttonFont);
         button7.setFont(buttonFont);
-        eraserSize.setFont(buttonFont);
+        eraser1.setFont(buttonFont);
+        eraser2.setFont(buttonFont);
+        eraser3.setFont(buttonFont);
+        colorButton.setFont(buttonFont);
 
-        Dimension maxButtonSize = new Dimension(150, 50);
+        Dimension maxButtonSize = new Dimension(200, 50);
         button1.setMaximumSize(maxButtonSize);
         button2.setMaximumSize(maxButtonSize);
         button3.setMaximumSize(maxButtonSize);
         button4.setMaximumSize(maxButtonSize);
         button5.setMaximumSize(maxButtonSize);
-        button6.setMaximumSize(maxButtonSize);
         button7.setMaximumSize(maxButtonSize);
-        eraserSize.setMaximumSize(maxButtonSize);
-        eraserSize.setPreferredSize(maxButtonSize);
+        colorButton.setMaximumSize(maxButtonSize);
+        eraser1.setMaximumSize(maxButtonSize);
+        eraser2.setMaximumSize(maxButtonSize);
+        eraser3.setMaximumSize(maxButtonSize);
 
         toolBar.add(button1);
         toolBar.add(button2);
@@ -176,8 +172,9 @@ public class GUI extends JFrame implements ActionListener {
         toolBar.add(button4);
         toolBar.add(button5);
         toolBar.add(button7);
-        toolBar.add(button6);
-        toolBar.add(eraserSize);
+        toolBar.add(eraser1);
+        toolBar.add(eraser2);
+        toolBar.add(eraser3);
         toolBar.add(colorButton);
 
         button1.addActionListener(this);
@@ -185,36 +182,11 @@ public class GUI extends JFrame implements ActionListener {
         button3.addActionListener(this);
         button4.addActionListener(this);
         button5.addActionListener(this);
-        button6.addActionListener(this);
         button7.addActionListener(this);
         colorButton.addActionListener(this);
-
-        eraserSize.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object source = e.getSource();
-                String selectedOption = "";
-                if (source instanceof JComboBox) 
-                {
-                    JComboBox<String> comboBox = (JComboBox<String>) source; // 安全地进行类型转换
-                    selectedOption = (String) comboBox.getSelectedItem();
-                } 
-                else 
-                {
-                    System.out.println("Error!!");
-                }
-
-                if (selectedOption.equals("Small")) {
-                    System.out.println("Option 1 selected");
-                    board.changeSize(EraserSize.Small);
-                } else if (selectedOption.equals("Medium")) {
-                    System.out.println("Option 2 selected");
-                    board.changeSize(EraserSize.Medium);
-                } else if (selectedOption.equals("Large")) {
-                    System.out.println("Option 3 selected");
-                    board.changeSize(EraserSize.Large);
-                }
-            }
-        });
+        eraser1.addActionListener(this);
+        eraser2.addActionListener(this);
+        eraser3.addActionListener(this);
 
         this.add(toolBar, BorderLayout.WEST);
 
@@ -456,8 +428,6 @@ public class GUI extends JFrame implements ActionListener {
                     }
                 }
             } 
-        } else if (command.equals("Clean All")) {
-            System.out.println("Clean");
         } else if (command.equals("Send")) {
             try {
                 String msg = inputBox.getText();
@@ -480,9 +450,21 @@ public class GUI extends JFrame implements ActionListener {
         } else if (command.equals("Free Draw")) {
             board.changeMode(DrawType.Free);
             System.out.println("5");
-        } else if (command.equals("Eraser")) {
+        } else if (command.equals("S Eraser")) {
             board.changeMode(DrawType.Eraser);
-            System.out.println("6");
+            board.changeSize(EraserSize.Small);
+            System.out.println(board.currentSize);
+            System.out.println("S");
+        } else if (command.equals("M Eraser")) {
+            board.changeMode(DrawType.Eraser);
+            board.changeSize(EraserSize.Medium);
+            System.out.println(board.currentSize);
+            System.out.println("M");
+        } else if (command.equals("L Eraser")) {
+            board.changeMode(DrawType.Eraser);
+            board.changeSize(EraserSize.Large);
+            System.out.println(board.currentSize);
+            System.out.println("L");
         } else if (command.equals("Text")) {
             board.changeMode(DrawType.Text);
             System.out.println("7");
