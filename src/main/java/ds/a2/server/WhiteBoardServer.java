@@ -39,7 +39,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 
 
     @Override
-    public void registerInServer(String[] clientInf) throws RemoteException {
+    public synchronized void registerInServer(String[] clientInf) throws RemoteException {
         if(clientInf.length == 4)
         {
             try{
@@ -83,7 +83,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
     }
 
     @Override
-    public void removeUser(String name) throws RemoteException {
+    public synchronized void removeUser(String name) throws RemoteException {
         
         Iterator<User> iterator = users.iterator();
         while (iterator.hasNext()) {
@@ -114,6 +114,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                     e.printStackTrace();
                 }
             }	
+            System.exit(0);
         }
         
         for(User user : users)
@@ -184,10 +185,13 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
 
     @Override
     public void kick(String name) throws RemoteException {
+        
         for(User user : users){
             if(user.name.equals(name))
             {
+                chatHistory.add("[Server]: " + name + " was kicked.");
                 user.rmic.getServerMsg("You are kicked by manager!");
+                removeUser(name);
                 user.rmic.close();
             }
         }

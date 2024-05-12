@@ -50,7 +50,7 @@ public class Board extends JPanel{
 		this.currentColor = color;
 	}
 
-    public void clearAll() {
+    public void cleanAll() {
     	shapes.clear();
     	board = null;
     }
@@ -66,7 +66,7 @@ public class Board extends JPanel{
     }
 
     public void loadImage(BufferedImage image) {
-    	clearAll();
+    	cleanAll();
     	repaint();
     	this.board = image;
     }

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
@@ -11,13 +12,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,6 +33,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ds.a2.DrawType;
 import ds.a2.EraserSize;
@@ -46,6 +53,9 @@ public class GUI extends JFrame implements ActionListener {
     public JScrollPane usrArea;
     public JScrollPane chatPlace;
     public JTextField inputBox;
+    JFileChooser fileChooser = new JFileChooser();
+    public File boardFile; 
+    public String savingType;
 
     public GUI(RMIServer rmis, String usrName, Boolean isManager) {
         super();
@@ -257,9 +267,9 @@ public class GUI extends JFrame implements ActionListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 System.out.println("Window is closing...");
-                if(!isManager)
+                if(isManager)
                 {
-                    JOptionPane.showMessageDialog(null, "Waiting all peers quiting!", "Wait", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Please wait the application to be closed!", "Wait", JOptionPane.INFORMATION_MESSAGE);
                 }
                 try {
                     rmis.removeUser(usrName);
@@ -268,27 +278,144 @@ public class GUI extends JFrame implements ActionListener {
                 }
             }
         });
+
+        fileChooser.setDialogTitle("Choose a file or directory");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fileChooser.setApproveButtonText("OK");
+
+        FileNameExtensionFilter imageFilter = new FileNameExtensionFilter("JPG", "jpg");
+        FileNameExtensionFilter textFilter = new FileNameExtensionFilter("PNG", "png");
+
+        fileChooser.setFileFilter(imageFilter);
+        fileChooser.setFileFilter(textFilter);
+    }
+
+    public void saveAs()
+    {
+        if(board != null)
+        {
+            BufferedImage image = board.getImageFromBoard();
+            int result = fileChooser.showOpenDialog(this);
+
+            FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter) fileChooser.getFileFilter();
+            if (selectedFilter instanceof FileNameExtensionFilter) {
+                FileNameExtensionFilter extensionFilter = (FileNameExtensionFilter) selectedFilter;
+                String[] extensions = extensionFilter.getExtensions();
+                if (extensions.length > 0) {
+                    savingType = extensions[0];
+                }
+            }
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+                String fileName = "image"; 
+                if (savingType.equals("jpg")) {
+                    fileName += ".jpg";
+                    BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g2d = newImage.createGraphics();
+                    g2d.setColor(Color.WHITE);
+                    g2d.fillRect(0, 0, newImage.getWidth(), newImage.getHeight());
+                    g2d.drawImage(image, 0, 0, null);
+                    g2d.dispose();
+                    image = newImage;
+                } else if (savingType.equals("png")) {
+                    fileName += ".png";
+                } else {
+                    System.out.println("Unknown file type: " + savingType);
+                    return;
+                }
+                boardFile = new File(path, fileName);
+                System.out.println("Selected path: " + boardFile);
+                try {
+                    ImageIO.write(image, savingType, boardFile);
+                    System.out.println(savingType);
+                    System.out.println("Image saved successfully.");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            } else {
+                System.out.println("User cancelled the operation");
+            }
+        }   
     }
 
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         if (command.equals("New")) {
-            System.out.println("New clicked");
+
+            Board newBoard = new Board();
+            newBoard.setRMI(rmis);
+            newBoard.setBackground(Color.WHITE);
+            getContentPane().remove(board);
+            getContentPane().add(newBoard, BorderLayout.CENTER);
+            board = newBoard;
+            revalidate();
+            repaint();
+            boardFile = null;
+            savingType = null;
+            board.synchronize();
+
         } else if (command.equals("Open")) {
-            System.out.println("Open clicked");
+            
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                boardFile = fileChooser.getSelectedFile();
+                String fileName = boardFile.getName();
+                int dotIndex = fileName.lastIndexOf(".");
+                if (dotIndex >= 0 && dotIndex < fileName.length() - 1) {
+                    savingType = fileName.substring(dotIndex + 1);
+                    System.out.println("File extension: " + savingType);
+                } else {
+                    System.out.println("No file extension found.");
+                }
+
+                try {
+                    BufferedImage image = ImageIO.read(boardFile);
+                    board.loadImage(image);
+                    board.synchronize();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+        } else {
+            System.out.println("User cancelled the operation");
+        }
+
         } else if (command.equals("Save")) {
-            System.out.println("Save clicked");
+            if(boardFile == null)
+            {
+                saveAs();
+            }
+            else
+            {
+                BufferedImage image = board.getImageFromBoard();
+                if (savingType.equals("jpg")) {
+                    BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g2d = newImage.createGraphics();
+                    g2d.setColor(Color.WHITE);
+                    g2d.fillRect(0, 0, newImage.getWidth(), newImage.getHeight());
+                    g2d.drawImage(image, 0, 0, null);
+                    g2d.dispose();
+                    image = newImage;
+                }
+                try {
+                    ImageIO.write(image, savingType, boardFile);
+                    System.out.println(savingType);
+                    System.out.println("Image saved successfully.");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
         } else if (command.equals("Save As")) {
-            System.out.println("Save As clicked");
+            saveAs();
         } else if (command.equals("Close")) {
-            System.out.println("Close clicked");
+
         } else if (command.equals("Kick")) {
             String input = JOptionPane.showInputDialog(null, "Please enter the user name of user that you want to kick:");
             if (input != null) 
             {
-                if(input == usrName)
+                if(input.equals(this.usrName))
                 {
-                    JOptionPane.showMessageDialog(null, "You cannot kick yourself", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "You cannot kick yourself!", "Error", JOptionPane.INFORMATION_MESSAGE);
                 }
                 else
                 {
