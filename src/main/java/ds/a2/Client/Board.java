@@ -163,7 +163,7 @@ public class Board extends JPanel{
 			byte[] b = out.toByteArray();
 			rmis.synchronize(b);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			System.out.println("Server closed!");
 			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();

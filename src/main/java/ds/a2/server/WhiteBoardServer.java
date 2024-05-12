@@ -24,6 +24,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
         chatHistory = new ArrayList<String>();
     }
 
+
     @Override
 	public void synchronize(byte[] b) throws RemoteException {
 		this.b = b;
@@ -107,14 +108,19 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
             for(User user : users)
             {
                 try {
+                    user.rmic.getUserList(usrNames);
                     user.rmic.getChatHistory(chatHistory);
+                    Thread.sleep(2000);
                     user.rmic.close();
                 } 
                 catch (RemoteException e) {
+                    System.out.println("Clear the users...");
+                } catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
-            }	
-            System.exit(0);
+            }
+            return;	
         }
         
         for(User user : users)

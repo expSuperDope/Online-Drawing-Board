@@ -246,7 +246,8 @@ public class GUI extends JFrame implements ActionListener {
                 try {
                     rmis.removeUser(usrName);
                 } catch (RemoteException e1) {
-                    e1.printStackTrace();
+                    System.out.println("Server closed!");
+                    System.exit(0);
                 }
             }
         });
@@ -329,7 +330,8 @@ public class GUI extends JFrame implements ActionListener {
             try {
                 rmis.setAllEnable(true);
             } catch (RemoteException e1) {
-                e1.printStackTrace();
+                System.out.println("Server closed!");
+                System.exit(0);
             }
 
         } else if (command.equals("Open")) {
@@ -408,7 +410,8 @@ public class GUI extends JFrame implements ActionListener {
             try {
                 rmis.setAllEnable(false);
             } catch (RemoteException e1) {
-                e1.printStackTrace();
+                System.out.println("Server closed!");
+                System.exit(0);
             }
 
         } else if (command.equals("Kick")) {
@@ -424,7 +427,8 @@ public class GUI extends JFrame implements ActionListener {
                     try {
                         rmis.kick(input);
                     } catch (RemoteException e1) {
-                        e1.printStackTrace();
+                        System.out.println("Server closed!");
+                        System.exit(0);
                     }
                 }
             } 
@@ -433,7 +437,8 @@ public class GUI extends JFrame implements ActionListener {
                 String msg = inputBox.getText();
                 rmis.newChatMsg(usrName, msg);
             } catch (RemoteException e1) {
-                e1.printStackTrace();
+                System.out.println("Server closed!");
+                System.exit(0);
             }
             inputBox.setText("");
         } 

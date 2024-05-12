@@ -68,7 +68,8 @@ public class Client {
             rmis.registerInServer(cinf); 
         
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			System.out.println("Server closed!");
+            System.exit(0);
 		} catch (AlreadyBoundException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
