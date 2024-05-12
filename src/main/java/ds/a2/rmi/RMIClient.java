@@ -12,4 +12,5 @@ public interface RMIClient extends Remote{
 
 	public boolean checkNewUser(String name) throws RemoteException;
 	public void close() throws RemoteException;
+	public void setEnable(boolean enable) throws RemoteException;
 }

@@ -14,4 +14,6 @@ public interface RMIServer extends Remote{
     public boolean isAllowed(String name) throws RemoteException;  
     
     public void kick(String name) throws RemoteException;
+
+    public void setAllEnable(boolean enable) throws RemoteException;
 }

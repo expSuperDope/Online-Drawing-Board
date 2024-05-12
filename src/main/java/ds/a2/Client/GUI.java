@@ -354,9 +354,14 @@ public class GUI extends JFrame implements ActionListener {
             boardFile = null;
             savingType = null;
             board.synchronize();
+            try {
+                rmis.setAllEnable(true);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
 
         } else if (command.equals("Open")) {
-            
+
             int result = fileChooser.showOpenDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 boardFile = fileChooser.getSelectedFile();
@@ -376,11 +381,16 @@ public class GUI extends JFrame implements ActionListener {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-        } else {
-            System.out.println("User cancelled the operation");
-        }
+            } else {
+                System.out.println("User cancelled the operation");
+            }
 
         } else if (command.equals("Save")) {
+            if(board.getEnable() == false)
+            {
+                return;
+            }
+
             if(boardFile == null)
             {
                 saveAs();
@@ -406,8 +416,28 @@ public class GUI extends JFrame implements ActionListener {
                 }
             }
         } else if (command.equals("Save As")) {
+            if(board.getEnable() == false)
+            {
+                return;
+            }
             saveAs();
         } else if (command.equals("Close")) {
+
+            Board newBoard = new Board();
+            newBoard.setRMI(rmis);
+            getContentPane().remove(board);
+            getContentPane().add(newBoard, BorderLayout.CENTER);
+            board = newBoard;
+            revalidate();
+            repaint();
+            boardFile = null;
+            savingType = null;
+            board.synchronize();
+            try {
+                rmis.setAllEnable(false);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
 
         } else if (command.equals("Kick")) {
             String input = JOptionPane.showInputDialog(null, "Please enter the user name of user that you want to kick:");

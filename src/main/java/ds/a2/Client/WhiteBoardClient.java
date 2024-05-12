@@ -71,4 +71,9 @@ public class WhiteBoardClient extends UnicastRemoteObject implements RMIClient{
 	public void getServerMsg(String msg) throws RemoteException {
 		JOptionPane.showMessageDialog(null, msg, "Message", JOptionPane.INFORMATION_MESSAGE);
 	}
+
+	@Override
+	public void setEnable(boolean enable) throws RemoteException {
+		gui.board.setEnable(enable);
+	}
 }

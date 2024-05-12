@@ -29,6 +29,7 @@ public class Board extends JPanel{
 	private Color currentColor = Color.BLACK;
 	private RMIServer rmis;
 	private BufferedImage board;
+	private boolean enable = true;
 	
     private static List<Point> points = new ArrayList<Point>();
     private static List<Shape> shapes = new ArrayList<Shape>();
@@ -37,6 +38,16 @@ public class Board extends JPanel{
     public void setRMI(RMIServer rmis) {
     	this.rmis = rmis;
     }
+
+	public boolean getEnable()
+	{
+		return enable;
+	}
+
+	public void setEnable(boolean enable)
+	{
+		this.enable = enable;
+	}
 
 	public void changeMode(DrawType mode) {
 		this.currentMode = mode;
@@ -164,6 +175,10 @@ public class Board extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) 
 			{
+				if(!enable)
+				{
+					return;
+				}
 				sPoint = e.getPoint();
 				ePoint = sPoint;
 				points.add(sPoint);
@@ -183,6 +198,11 @@ public class Board extends JPanel{
 		
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				if(!enable)
+				{
+					return;
+				}
+
 				if(rmis != null) {
 					ePoint = e.getPoint();
 					Graphics2D g2d = (Graphics2D)getGraphics();
@@ -240,6 +260,11 @@ public class Board extends JPanel{
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+				if(!enable)
+				{
+					return;
+				}
+				
             	if(rmis != null && sPoint != null) 
 				{
 					Graphics2D g2d = (Graphics2D)getGraphics();

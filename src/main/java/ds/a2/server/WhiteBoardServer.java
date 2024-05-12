@@ -196,4 +196,12 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
             }
         }
     }
+
+    @Override
+    public void setAllEnable(boolean enable) throws RemoteException {
+        for(User u:users)
+        {
+            u.rmic.setEnable(enable);
+        }
+    }
 }
