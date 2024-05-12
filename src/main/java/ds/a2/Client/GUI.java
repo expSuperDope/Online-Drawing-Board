@@ -427,8 +427,7 @@ public class GUI extends JFrame implements ActionListener {
                     try {
                         rmis.kick(input);
                     } catch (RemoteException e1) {
-                        System.out.println("Server closed!");
-                        System.exit(0);
+                        
                     }
                 }
             } 

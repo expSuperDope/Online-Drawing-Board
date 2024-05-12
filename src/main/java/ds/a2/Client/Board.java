@@ -84,7 +84,7 @@ public class Board extends JPanel{
 
     public void paint(Graphics g){
 		super.paint(g);
-		Graphics2D g2d = (Graphics2D)g;
+		Graphics2D g2d = (Graphics2D) g;
         if(board != null) 
 		{
         	g.drawImage(board, 0, 0, this);
@@ -125,7 +125,8 @@ public class Board extends JPanel{
 				}
 				else
 				{
-					tmpShapes.add(new Shape(DrawType.Line, new Point(s_x, s_y), ePoint, Color.white));
+					//TODO
+					tmpShapes.add(new Shape(DrawType.Line, new Point(s_x, s_y), ePoint, currentSize));
 				}
 				points.add(ePoint);
 				g2d.setColor(currentColor);
@@ -205,7 +206,7 @@ public class Board extends JPanel{
 
 				if(rmis != null) {
 					ePoint = e.getPoint();
-					Graphics2D g2d = (Graphics2D)getGraphics();
+					Graphics2D g2d = (Graphics2D) getGraphics();
 					g2d.setColor(currentColor);
 
 					int x = Math.min(sPoint.x, ePoint.x);

@@ -13,7 +13,6 @@ public class Shape {
     private List<Point> path;
     private String text;
     private EraserSize size;
-    private Stroke stroke;
 
     //For basic shape(Line, Circle, Ovel, Rectangle)
     public Shape(DrawType type, Point s, Point e, Color color)
@@ -24,6 +23,7 @@ public class Shape {
         this.color = color;
         this.path = null;
         this.text = null;
+        this.size = EraserSize.Small;
     }
 
     //For free draw
@@ -47,7 +47,19 @@ public class Shape {
         this.color = Color.WHITE;
         this.path = path;
         this.text = null;
-        this.size = EraserSize.Small;
+        this.size = size;
+    }
+
+    //For eraser line shape
+    public Shape(DrawType type, Point s, Point e, EraserSize size)
+    {
+        this.type = type;
+        this.startPoint = s;
+        this.endPoint = e;
+        this.color = Color.WHITE;
+        this.path = null;
+        this.text = null;
+        this.size = size;
     }
 
     //For text
@@ -71,6 +83,17 @@ public class Shape {
         g2d.setColor(color);
         if (type == DrawType.Line) 
         {
+            Stroke stroke = new BasicStroke(1);
+            if(size == EraserSize.Medium)
+            {
+                stroke = new BasicStroke(20);
+            }
+            else if (size == EraserSize.Large)
+            {
+                stroke = new BasicStroke(50);
+            }
+            
+            g2d.setStroke(stroke);
             g2d.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
         } 
         else if (type == DrawType.Circle) 
@@ -99,15 +122,17 @@ public class Shape {
         } 
         else if (type == DrawType.Free || type == DrawType.Eraser) 
         {
+            Stroke stroke = new BasicStroke(1);
             if(size == EraserSize.Medium)
             {
-                g2d.setStroke(new BasicStroke(50));
+                stroke = new BasicStroke(20);
             }
             else if (size == EraserSize.Large)
             {
-                g2d.setStroke(new BasicStroke(100));
+                stroke = new BasicStroke(50);
             }
             
+            g2d.setStroke(stroke);
             for (int i = 0; i < path.size() - 1; i++) 
             {
                 g2d.drawLine(path.get(i).x, path.get(i).y, path.get(i+1).x, path.get(i+1).y);
