@@ -62,7 +62,6 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                     usrNames.add(user.name);
                 }
 
-
                 chatHistory.add("[Server]: " + userName + " entered.");
                 for(User user : users){
                     try {
@@ -86,6 +85,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
     @Override
     public synchronized void removeUser(String name) throws RemoteException {
         
+        boolean ifQuit = false;
         Iterator<User> iterator = users.iterator();
         while (iterator.hasNext()) {
             User user = iterator.next();
@@ -104,6 +104,7 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
         chatHistory.add("[Server]: " + name + " left.");
         if(name.equals(managerName))
         {
+            ifQuit = true;
             chatHistory.add("[Server]: Manager left.\n[Server]: Application will close soon.");
             for(User user : users)
             {
@@ -120,19 +121,24 @@ public class WhiteBoardServer extends UnicastRemoteObject implements RMIServer{
                     e.printStackTrace();
                 }
             }
-            return;	
+            chatHistory = new ArrayList<String>();
+            b = null;
+            users = new ArrayList<User>();
         }
         
-        for(User user : users)
+        if(!ifQuit)
         {
-            try {
-                user.rmic.getUserList(usrNames);
-                user.rmic.getChatHistory(chatHistory);
-            } 
-            catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }	
+            for(User user : users)
+            {
+                try {
+                    user.rmic.getUserList(usrNames);
+                    user.rmic.getChatHistory(chatHistory);
+                } 
+                catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }	
+        } 
     }
 
     @Override

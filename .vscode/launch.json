@@ -4,18 +4,28 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+
+    
         {
             "type": "java",
-            "name": "Client 1",
+            "name": "Manager",
             "request": "launch",
-            "mainClass": "ds.a2.Client.Client",
+            "mainClass": "ds.a2.Client.CreateWhiteBoard",
             "args": ["localhost", "12000", "Test1"]
         },
         {
             "type": "java",
-            "name": "Client 2",
+            "name": "Manager2",
             "request": "launch",
-            "mainClass": "ds.a2.Client.Client",
+            "mainClass": "ds.a2.Client.CreateWhiteBoard",
+            "args": ["localhost", "12000", "Test2"]
+        },
+        {
+            "type": "java",
+            "name": "User",
+            "request": "launch",
+            "mainClass": "ds.a2.Client.JoinWhiteBoard",
             "args": ["localhost", "12000", "Test2"]
         },
         {

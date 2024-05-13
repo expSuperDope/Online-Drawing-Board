@@ -352,6 +352,7 @@ public class GUI extends JFrame implements ActionListener {
                     BufferedImage image = ImageIO.read(boardFile);
                     board.loadImage(image);
                     board.synchronize();
+                    rmis.setAllEnable(true);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }

@@ -16,7 +16,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Client {
+public class CreateWhiteBoard {
 
     public static int findAvailablePort() throws IOException {
         try (ServerSocket socket = new ServerSocket(0)) {
@@ -48,15 +48,15 @@ public class Client {
             cinf[3] = "whiteboardclient";
             RMIServer rmis = (RMIServer) Naming.lookup("rmi://" + serverIp + ":" + serverPort + "/whiteboardserver");
             
-            if(rmis.ifDuplicate(userName))
-            {
-                System.out.println("You are not allowed, because there is already a user called " + userName);
-                return;
-            }
+            // if(rmis.ifDuplicate(userName))
+            // {
+            //     System.out.println("You are not allowed, because there is already a user called " + userName);
+            //     return;
+            // }
 
-            if(!rmis.isFirst(userName) && !rmis.isAllowed(userName))
+            if(!rmis.isFirst(userName))
             {
-                System.out.println("You are rejected by the manager");
+                System.out.println("Warning! White board is already created");
                 return;   
             }
             
